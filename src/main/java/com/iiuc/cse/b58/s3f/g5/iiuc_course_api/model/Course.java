@@ -1,7 +1,6 @@
 package com.iiuc.cse.b58.s3f.g5.iiuc_course_api.model;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
