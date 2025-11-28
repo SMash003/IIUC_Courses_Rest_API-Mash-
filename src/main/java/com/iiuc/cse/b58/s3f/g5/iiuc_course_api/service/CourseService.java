@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 public class CourseService {
     private final CourseRepository courseRepository;
     private Long nextId = 100L;
+
     @Autowired
     public CourseService(CourseRepository courseRepository) {
         this.courseRepository = courseRepository;
@@ -84,6 +85,7 @@ public class CourseService {
         
         return courseRepository.deleteById(id);
     }
+    
     public Course assignFacultyToCourse(Long courseId, String facultyName, String semester) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found"));
