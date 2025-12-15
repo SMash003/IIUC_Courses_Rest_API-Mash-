@@ -49,7 +49,7 @@ public class CourseRepository {
             existing.setCourseCredit(course.getCourseCredit());
             existing.setCourseType(course.getCourseType());
             existing.setSemester(course.getSemester());
-            existing.setCourseTeacher(course.getCourseTeacher());
+            existing.setCourseTeachers(course.getCourseTeachers());
         });
 
         return course;

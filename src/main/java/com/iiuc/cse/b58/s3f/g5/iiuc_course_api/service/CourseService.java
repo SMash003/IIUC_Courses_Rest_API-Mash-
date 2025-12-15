@@ -1,6 +1,5 @@
 package com.iiuc.cse.b58.s3f.g5.iiuc_course_api.service;
 
-
 import java.util.List;
 import java.util.Optional;
 
@@ -32,8 +31,9 @@ public class CourseService {
             throw new IllegalArgumentException("Course credit must be between 1 and 4");
         }
 
-        if (!course.getCourseCode().matches("[A-Z]{3}\\d{3}")) {
-            throw new IllegalArgumentException("Invalid course code format. Use format: CSE2321");
+        if (!course.getCourseCode().matches("[A-Z]{3,4}\\d{4}")) {
+            throw new IllegalArgumentException(
+                    "Invalid course code format.Course code must be 3–4 uppercase letters followed by 4 digits.");
         }
 
         if (course.getCourseTitle() == null || course.getCourseTitle().trim().isEmpty()) {
@@ -53,6 +53,10 @@ public class CourseService {
         return courseRepository.findByCourseCode(code);
     }
 
+    public List<Course> getCourseByDepartment(Long deptId) {
+        return courseRepository.findByDepartmentId(deptId);
+    }
+
     public Course updateCourse(Long id, Course updatedCourse) {
         Optional<Course> existingCourseOpt = courseRepository.findById(id);
 
@@ -69,7 +73,7 @@ public class CourseService {
         existingCourse.setCourseCredit(updatedCourse.getCourseCredit());
         existingCourse.setCourseType(updatedCourse.getCourseType());
         existingCourse.setSemester(updatedCourse.getSemester());
-        existingCourse.setCourseTeacher(updatedCourse.getCourseTeacher());
+        existingCourse.setCourseTeachers(updatedCourse.getCourseTeachers());
 
         return courseRepository.updateCourse(existingCourse);
     }
@@ -77,11 +81,11 @@ public class CourseService {
     public boolean deleteCourse(Long id) {
         Course course = courseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found"));
-        
-        if (course.getCourseTeacher() != null && !course.getCourseTeacher().isEmpty()) {
+
+        if (course.getCourseTeachers() != null && !course.getCourseTeachers().isEmpty()) {
             throw new IllegalStateException("Cannot delete course with assigned faculty");
         }
-        
+
         return courseRepository.deleteById(id);
     }
 
@@ -90,24 +94,27 @@ public class CourseService {
         return courseRepository.deleteByCourseCode(code);
     }
 
-    public Course assignFacultyToCourse(Long courseId, String facultyName, String semester) {
+    public Course assignTeachersToCourse(Long courseId, List<String> teachers, String semester) {
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found"));
 
-        long assignedCount = courseRepository.findAll().stream()
-                .filter(c -> semester.equals(c.getSemester()) &&
-                        facultyName.equals(c.getCourseTeacher()))
-                .count();
+        // Validate each teacher: max 3 courses per semester
+        for (String teacher : teachers) {
+            long assignedCount = courseRepository.findAll().stream()
+                    .filter(c -> semester.equals(c.getSemester()) &&
+                            c.getCourseTeachers().contains(teacher))
+                    .count();
 
-        if (assignedCount >= 3) {
-            throw new IllegalStateException(
-                "Faculty " + facultyName + " already has 3 courses in " + semester
-            );
+            if (assignedCount >= 3) {
+                throw new IllegalStateException(
+                        "Teacher " + teacher + " already has 3 courses in " + semester);
+            }
+
+            // Add teacher to course if not already added
+            course.addCourseTeacher(teacher);
         }
 
-        course.setCourseTeacher(facultyName);
         course.setSemester(semester);
         return courseRepository.updateCourse(course);
     }
 }
-

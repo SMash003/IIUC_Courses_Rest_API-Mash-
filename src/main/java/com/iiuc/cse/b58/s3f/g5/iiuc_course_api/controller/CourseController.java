@@ -21,6 +21,7 @@ public class CourseController {
         this.courseService = courseService;
     }
 
+
     // ---------------- Create Course (single or multiple) ----------------
     @PostMapping
     public Object createCourse(@RequestBody Object body) {
@@ -71,6 +72,11 @@ public class CourseController {
         }
     }
 
+    @GetMapping("/department/{deptId}")
+    public List<Course> getCourseByDepartment(@PathVariable Long deptId) {
+        return courseService.getCourseByDepartment(deptId);
+    }
+
     // ---------------- Update course ----------------
     @PutMapping("/{id}")
     public Object updateCourse(@PathVariable Long id, @RequestBody Course course) {
@@ -98,34 +104,29 @@ public class CourseController {
     }
 
     @DeleteMapping("/code/{code}")
-    public String deleteCoursebyCode(@PathVariable String code)
-    {
-        try
-        {
+    public String deleteCoursebyCode(@PathVariable String code) {
+        try {
             boolean deleted = courseService.deleteCourseByCode(code);
-            if(deleted)
-            {
+            if (deleted) {
                 return "Course with Code " + code + "deleted successfully.";
-            } else
-            {
+            } else {
                 return "Course with Code " + code + "not found or cannot  delete.";
             }
-        }
-        catch (IllegalStateException | IllegalArgumentException e) {
+        } catch (IllegalStateException | IllegalArgumentException e) {
             return e.getMessage();
         }
     }
 
     // ---------------- Assign faculty to course ----------------
-    @PostMapping("/{id}/assign")
-    public Object assignFaculty(
+    @PutMapping("/{id}/assign")
+    public Object assignTeachers(
             @PathVariable Long id,
-            @RequestParam String facultyName,
-            @RequestParam String semester) {
+            @RequestBody AssignTeachersRequest request) {
         try {
-            return courseService.assignFacultyToCourse(id, facultyName, semester);
+            return courseService.assignTeachersToCourse(id, request.getTeachers(), request.getSemester());
         } catch (IllegalArgumentException | IllegalStateException e) {
             return e.getMessage();
         }
     }
+
 }
