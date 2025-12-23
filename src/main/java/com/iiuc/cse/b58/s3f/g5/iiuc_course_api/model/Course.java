@@ -1,5 +1,8 @@
 package com.iiuc.cse.b58.s3f.g5.iiuc_course_api.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -7,7 +10,7 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "courses")
 public class Course {
-    
+
     @Id
     private Long id;
     private String courseCode;
@@ -16,13 +19,14 @@ public class Course {
     private String courseType;
     private String semester;
     private Long departmentId;
-    private String courseTeacher;
+    private List<String> courseTeachers = new ArrayList<>();
+    private String department;
 
     public Course() {
     }
 
-    public Course(Long id, String courseCode, String courseTitle, Double courseCredit, String courseType, 
-                 String semester, Long departmentId, String courseTeacher) {
+    public Course(Long id, String courseCode, String courseTitle, Double courseCredit, String courseType,
+            String semester, Long departmentId, List<String> courseTeachers) {
         this.id = id;
         this.courseCode = courseCode;
         this.courseTitle = courseTitle;
@@ -30,7 +34,30 @@ public class Course {
         this.courseType = courseType;
         this.semester = semester;
         this.departmentId = departmentId;
-        this.courseTeacher = courseTeacher;
+        this.courseTeachers = courseTeachers;
+
+        switch (departmentId.intValue()) {
+            case 1:
+                this.department = "CSE";
+                break;
+            case 2:
+                this.department = "EEE";
+                break;
+            case 3:
+                this.department = "CIVIL";
+                break;
+            case 4:
+                this.department = "ETE";
+                break;
+            case 5:
+                this.department = "CCE";
+                break;
+            case 6:
+                this.department = "PHARMA";
+            default:
+                this.department = "Not existed";
+                break;
+        }
     }
 
     public Long getId() {
@@ -89,12 +116,40 @@ public class Course {
         this.departmentId = departmentId;
     }
 
-    public String getCourseTeacher() {
-        return courseTeacher;
+     public List<String> getCourseTeachers() {
+        return courseTeachers;
     }
 
-    public void setCourseTeacher(String courseTeacher) {
-        this.courseTeacher = courseTeacher;
+    public void setCourseTeachers(List<String> courseTeachers) {
+        this.courseTeachers = courseTeachers;
+    }
+
+    public void addCourseTeacher(String teacher) {
+        if (!this.courseTeachers.contains(teacher)) {
+            this.courseTeachers.add(teacher);
+        }
+    }
+
+    public String getDepartment() {
+        if (departmentId == null)
+            return "Not existed";
+
+        switch (departmentId.intValue()) {
+            case 1:
+                return "CSE";
+            case 2:
+                return "EEE";
+            case 3:
+                return "CIVIL";
+            case 4:
+                return "ETE";
+            case 5:
+                return "CCE";
+            case 6:
+                return "PHARMA";
+            default:
+                return "Not existed";
+        }
     }
 
     @Override
@@ -107,7 +162,8 @@ public class Course {
                 ", courseType='" + courseType + '\'' +
                 ", semester='" + semester + '\'' +
                 ", departmentId=" + departmentId +
-                ", courseTeacher='" + courseTeacher + '\'' +
+                ", courseTeacher=" + courseTeachers + '\'' +
+                ", department=" + department + '\'' +
                 '}';
     }
 }
