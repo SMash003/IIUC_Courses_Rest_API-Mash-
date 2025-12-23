@@ -79,12 +79,8 @@ public class CourseService {
     }
 
     public boolean deleteCourse(Long id) {
-        Course course = courseRepository.findById(id)
+        courseRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found"));
-
-        if (course.getCourseTeachers() != null && !course.getCourseTeachers().isEmpty()) {
-            throw new IllegalStateException("Cannot delete course with assigned faculty");
-        }
 
         return courseRepository.deleteById(id);
     }
